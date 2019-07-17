@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('network-status', [])
+angular.module('networkStatus', [])
   .factory('ConnectionStatus', ['$rootScope', '$q', '$injector', '$interval', '$timeout', 'appConfig', function($rootScope, $q, $injector, $interval, $timeout, appConfig) {
 
     var latency = 0;
@@ -93,16 +93,13 @@ angular.module('network-status', [])
   .directive('connectionStatus', ['$rootScope', '$interval', function($rootScope, $interval) {
     return {
       restrict: 'E',
-      scope: {
-        url: '@url',
-        version: '@version',
-        template: function() {
-          return [
-            '<li class="iam-online" title="Você possui conexão com a internet" ng-if="connection.iamOnline && connection.isLatencyOkay"><i class="fa fa-wifi" aria-hidden="true"></i></li>',
-            '<li class="iam-lagging" title="Sua conexão com a internet está lenta" ng-if="!connection.isLatencyOkay"><i class="fa fa-wifi" aria-hidden="true"></i></li>',
-            '<li class="iam-not-online" title="Você não possui conexão com a internet" ng-if="!connection.iamOnline"><img src="../img/notwifi.svg" alt=""></li>'
-          ].join('');
-        }
+      scope: {},
+      template: function() {
+        return [
+          '<li class="iam-online" title="Você possui conexão com a internet" ng-if="connection.iamOnline && connection.isLatencyOkay"><i class="fa fa-wifi" aria-hidden="true"></i></li>',
+          '<li class="iam-lagging" title="Sua conexão com a internet está lenta" ng-if="!connection.isLatencyOkay"><i class="fa fa-wifi" aria-hidden="true"></i></li>',
+          '<li class="iam-not-online" title="Você não possui conexão com a internet" ng-if="!connection.iamOnline"><img src="../img/notwifi.svg" alt=""></li>'
+        ].join('');
       },
       link: function(scope, elm, attrs, ctrl) {
 
@@ -127,23 +124,20 @@ angular.module('network-status', [])
   .directive('apiStatus', ['$rootScope', '$httpProvider', function($rootScope, $httpProvider) {
     return {
       restrict: 'E',
-      scope: {
-        url: '@url',
-        version: '@version',
-        template: function() {
-          return [
-            '<section class="status-server container">',
-              '<h3>Você não esta conseguindo se conectar com ao nosso servidor.</h3>',
-              '<span>',
-                '<h4 ng-show="!connection.showTryFailed">Aguarde, tentaremos reconectar em {{connection.countDown}} segundos...</h4>',
-              '</span>',
-              '<span ng-show="connection.showTryFailed">',
-                '<h4>Nova tentativa falhou, verifique sua conexão com a internet.</h4>',
-              '</span>',
-              '<div class="loader"></div>',
-            '</section>'
-          ].join('');
-        }
+      scope: {},
+      template: function() {
+        return [
+          '<section class="status-server container">',
+          '<h3>Você não esta conseguindo se conectar com ao nosso servidor.</h3>',
+          '<span>',
+          '<h4 ng-show="!connection.showTryFailed">Aguarde, tentaremos reconectar em {{connection.countDown}} segundos...</h4>',
+          '</span>',
+          '<span ng-show="connection.showTryFailed">',
+          '<h4>Nova tentativa falhou, verifique sua conexão com a internet.</h4>',
+          '</span>',
+          '<div class="loader"></div>',
+          '</section>'
+        ].join('');
       },
       link: function(scope, elm, attrs, ctrl) {
 
