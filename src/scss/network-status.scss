@@ -1,0 +1,53 @@
+.iam-online {
+  cursor: default !important;
+  padding-top: 5px;
+  color: #47C333;
+  padding-right: 10px;
+  font-size: 2em;
+}
+
+.iam-lagging {
+  cursor: default !important;
+  padding-top: 5px;
+  color: #D78922;
+  padding-right: 10px;
+  font-size: 2em;
+}
+
+.iam-not-online {
+  cursor: default !important;
+  border-radius: 5px;
+  padding: 7px;
+  color: #f6f6f6;
+  background-color: #854D49;
+  img {
+    height: 35px;
+  }
+}
+
+.open-status-server {
+  background-color: #4C4C4C;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  display: none;
+  position: fixed;
+  border-radius: 10px;
+  z-index: 1033;
+  &.opened {
+    display: block !important;
+  }
+  .status-server{
+    border-radius: 5px;
+    background-color: #FFFFFF;
+    margin-top: 10%;
+    margin-left: 23%;
+    padding: 30px;
+    width: 53%;
+    height: 55%;
+    h4 {
+      margin: 20px;
+    }
+  }
+}

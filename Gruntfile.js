@@ -16,10 +16,25 @@ module.exports = function (grunt) {
 
   var srcFolder         = 'src';
   var distFolder         = 'dist';
-  var distFile         = '{0}/network-status.js'.format([distFolder]);
+  var distFile         = '{0}/js/network-status.js'.format([distFolder]);
+  var distCssFile         = '{0}/scss'.format([distFolder]);
+  var distImgFile         = '{0}/img'.format([distFolder]);
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
+    copy: {
+      img: {
+        files: [
+          {expand: true, cwd: srcFolder, src: ['img/*'], dest: distFolder}
+        ]
+      },
+      scss: {
+        files: [
+          {expand: true, cwd: srcFolder, src: ['scss/*'], dest: distFolder}
+        ]
+      }
+    },
 
     concat: {
       options: {},
@@ -35,7 +50,7 @@ module.exports = function (grunt) {
       options: {},
       dist: {
         files: {
-          'dist/network-status.min.js': [distFile]
+          'dist/js/network-status.min.js': [distFile]
         }
       }
     },
@@ -59,9 +74,10 @@ module.exports = function (grunt) {
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-clean');
 
-  grunt.registerTask('default', ['clean', 'concat', 'uglify']);
+  grunt.registerTask('default', ['clean', 'copy', 'concat', 'uglify']);
 };
