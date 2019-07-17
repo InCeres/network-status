@@ -105,6 +105,15 @@ angular.module('network-status', [])
         }
       },
       link: function(scope, elm, attrs, ctrl) {
+
+        $rootScope.connection = {
+          iamOnline: true,
+          isLatencyOkay: true,
+          isApiAccessible: false,
+          countDown: 15,
+          showTryFailed: false
+        };
+
         var getInternetStatus = function(){
           $rootScope.connection.iamOnline = false;
           if (navigator.onLine) {
@@ -137,6 +146,15 @@ angular.module('network-status', [])
         }
       },
       link: function(scope, elm, attrs, ctrl) {
+
+        $rootScope.connection = {
+          iamOnline: true,
+          isLatencyOkay: true,
+          isApiAccessible: false,
+          countDown: 15,
+          showTryFailed: false
+        };
+
         $httpProvider.interceptors.push('ConnectionStatus');
       }
     }
