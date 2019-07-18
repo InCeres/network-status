@@ -48,6 +48,7 @@ angular.module('networkStatus', [])
           latency = (+new Date()) - startTime;
           if (latency > 1500){
             $rootScope.connection.isLatencyOkay = false;
+            $rootScope.connection.message = 'Sua conexão com a Internet está lenta';
           }
         }
         return response;
@@ -93,40 +94,38 @@ angular.module('networkStatus', [])
   .directive('connectionStatus', ['$rootScope', '$interval', function($rootScope, $interval) {
     return {
       restrict: 'E',
-      scope: {},
+      replace: true,
       template: function() {
         return [
-          '<li class="iam-online" title="Você possui conexão com a internet" ng-if="connection.iamOnline && connection.isLatencyOkay"><i class="fa fa-wifi" aria-hidden="true"></i></li>',
-          '<li class="iam-lagging" title="Sua conexão com a internet está lenta" ng-if="!connection.isLatencyOkay"><i class="fa fa-wifi" aria-hidden="true"></i></li>',
-          '<li class="iam-not-online" title="Você não possui conexão com a internet" ng-if="!connection.iamOnline"><img src="../img/notwifi.svg" alt=""></li>'
+          '<li ng-class="{\'iam-online\': connection.iamOnline && connection.isLatencyOkay, \'iam-lagging\': !connection.isLatencyOkay, \'iam-not-online\': !connection.iamOnline}" title="{{connection.message}}">',
+          '<i class="fa fa-wifi online" aria-hidden="true" ng-if="connection.iamOnline && connection.isLatencyOkay"></i>',
+          '<i class="fa fa-wifi lagging" aria-hidden="true" ng-if="!connection.isLatencyOkay"></i>',
+          '<img src="../img/notwifi.svg" class="offline" alt="" ng-if="!connection.iamOnline">',
+          '</li>'
         ].join('');
       },
       link: function(scope, elm, attrs, ctrl) {
 
-        $rootScope.connection = {
-          iamOnline: true,
-          isLatencyOkay: true,
-          isApiAccessible: false,
-          countDown: 15,
-          showTryFailed: false
-        };
-
-        var getInternetStatus = function(){
+        var getInternetStatus = function() {
           $rootScope.connection.iamOnline = false;
+          $rootScope.connection.message = 'Você está sem conexão a Internet';
           if (navigator.onLine) {
             $rootScope.connection.iamOnline = true;
+            $rootScope.connection.message = 'Você possui conexão com a internet';
           }
         };
-        $interval(getInternetStatus, 1500);
+
+        $interval(getInternetStatus, 1000);
       }
     }
   }])
-  .directive('apiStatus', ['$rootScope', '$httpProvider', function($rootScope, $httpProvider) {
+  .directive('apiStatus', function() {
     return {
       restrict: 'E',
-      scope: {},
-      template: function() {
+      replace: true,
+      template: function () {
         return [
+          '<div id="showDinno" class="open-status-server" ng-class="{\'opened\': !connection.isApiAccessible}">',
           '<section class="status-server container">',
           '<h3>Você não esta conseguindo se conectar com ao nosso servidor.</h3>',
           '<span>',
@@ -136,20 +135,9 @@ angular.module('networkStatus', [])
           '<h4>Nova tentativa falhou, verifique sua conexão com a internet.</h4>',
           '</span>',
           '<div class="loader"></div>',
-          '</section>'
+          '</section>',
+          '</div>'
         ].join('');
-      },
-      link: function(scope, elm, attrs, ctrl) {
-
-        $rootScope.connection = {
-          iamOnline: true,
-          isLatencyOkay: true,
-          isApiAccessible: false,
-          countDown: 15,
-          showTryFailed: false
-        };
-
-        $httpProvider.interceptors.push('ConnectionStatus');
       }
     }
-  }]);
+  });
