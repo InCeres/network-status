@@ -8,7 +8,7 @@ angular.module('networkStatus', [])
     var promiseStarted = false;
 
     return {
-      request: function(config) {
+      'request': function(config) {
         if(config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
           startTime = +new Date();
           return config;
@@ -29,20 +29,23 @@ angular.module('networkStatus', [])
             return $q.reject(config);
           },
           function(error) {
-            if (error.status === 502)
+            if (error.status === 502){
               $rootScope.connection.isApiAccessible = false;
-            itIsTheFinalCountDown();
-            return $q.reject(config);
+              itIsTheFinalCountDown();
+              return $q.reject(error.config);
+            }
+            return error.config;
           });
       },
-      requestError: function(request) {
-        if (request.status === 502){
+      'responseError': function(response) {
+        if (response.status === 502){
           $rootScope.connection.isApiAccessible = false;
           itIsTheFinalCountDown();
-          return $q.reject(request);
+          return $q.reject(response);
         }
+        return response;
       },
-      response: function(response) {
+      'response': function(response) {
         if(response.config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
           $rootScope.connection.isLatencyOkay = true;
           latency = (+new Date()) - startTime;
@@ -97,7 +100,7 @@ angular.module('networkStatus', [])
       replace: true,
       template: function() {
         return [
-          '<li ng-class="{\'iam-online\': connection.iamOnline && connection.isLatencyOkay, \'iam-lagging\': !connection.isLatencyOkay, \'iam-not-online\': !connection.iamOnline}" title="{{connection.message}}">',
+          '<li class="icon-wifi" ng-class="{\'iam-online\': connection.iamOnline && connection.isLatencyOkay, \'iam-lagging\': !connection.isLatencyOkay, \'iam-not-online\': !connection.iamOnline}" title="{{connection.message}}">',
           '<i class="fa fa-wifi online" aria-hidden="true" ng-if="connection.iamOnline && connection.isLatencyOkay"></i>',
           '<i class="fa fa-wifi lagging" aria-hidden="true" ng-if="!connection.isLatencyOkay"></i>',
           '<img src="../img/notwifi.svg" class="offline" alt="" ng-if="!connection.iamOnline">',
