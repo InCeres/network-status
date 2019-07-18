@@ -137,7 +137,7 @@ angular.module('networkStatus', [])
           '<span ng-show="connection.showTryFailed">',
           '<h4>Nova tentativa falhou, verifique sua conexão com a internet.</h4>',
           '</span>',
-          '<div class="loader"></div>',
+          '<i class="fa fa-spinner fa-spin spiner-server"></i>',
           '</section>',
           '</div>'
         ].join('');

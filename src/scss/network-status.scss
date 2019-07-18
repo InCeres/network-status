@@ -1,16 +1,19 @@
 .icon-wifi {
   list-style: none;
 }
+
 .iam-online {
   cursor: default !important;
   color: #47C333;
   font-size: 1.6em;
 }
+
 .iam-lagging {
   cursor: default !important;
   color: #D78922;
   font-size: 1.6em;
 }
+
 .iam-not-online {
   cursor: default !important;
   border-radius: 5px;
@@ -19,6 +22,12 @@
     height: 1.6em;
   }
 }
+
+.spiner-server {
+  font-size: 2.5em;
+  margin-left: 45%;
+}
+
 .open-status-server {
   background-color: #4C4C4C;
   left: 0;
@@ -36,6 +45,7 @@
     border-radius: 5px;
     background-color: #FFFFFF;
     margin-top: 10%;
+    color: black;
     margin-left: 23%;
     padding: 30px;
     width: 53%;
