@@ -12,7 +12,7 @@ Para adicionar no AngularJS, adicione a dependência ao seu app:
 
     var seuApp = angular.module(
       'seuApp', [
-        'network-status'
+        'networkStatus'
       ]
     );
 
