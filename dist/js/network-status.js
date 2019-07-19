@@ -6,9 +6,11 @@ angular.module('networkStatus', [])
     var latency = 0;
     var startTime = 0;
     var promiseStarted = false;
+    const oneSecondInMs = 1000;
 
     return {
       'request': function(config) {
+        $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
         if(config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
           startTime = +new Date();
           return config;
@@ -21,7 +23,7 @@ angular.module('networkStatus', [])
           function (response) {
             if (response.data.result === 'OK'){
               $rootScope.connection.isApiAccessible = true;
-              $rootScope.connection.countDown = 15;
+              $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
               return config;
             }
             $rootScope.connection.isApiAccessible = false;
@@ -49,7 +51,7 @@ angular.module('networkStatus', [])
         if(response.config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
           $rootScope.connection.isLatencyOkay = true;
           latency = (+new Date()) - startTime;
-          if (latency > 1500){
+          if (latency > $rootScope.connection.maximumLatency * oneSecondInMs){
             $rootScope.connection.isLatencyOkay = false;
             $rootScope.connection.message = 'Sua conexão com a Internet está lenta';
           }
@@ -71,26 +73,26 @@ angular.module('networkStatus', [])
                   promiseStarted = false;
                   $interval.cancel(promise);
                   $rootScope.connection.isApiAccessible = true;
-                  $rootScope.connection.countDown = 15;
+                  $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
                   return response;
                 }
-                $rootScope.connection.countDown = 18;
+                $rootScope.connection.countDown = $rootScope.connection.refreshInterval + $rootScope.connection.waitForNextTry;
                 $rootScope.connection.showTryFailed = true;
                 $timeout(function() {
                   $rootScope.connection.showTryFailed = false;
-                }, 3000);
+                }, $rootScope.connection.waitForNextTry * oneSecondInMs);
                 return response;
               },
               function(error) {
-                $rootScope.connection.countDown = 18;
+                $rootScope.connection.countDown = $rootScope.connection.refreshInterval + $rootScope.connection.waitForNextTry;
                 $rootScope.connection.showTryFailed = true;
                 $timeout(function() {
                   $rootScope.connection.showTryFailed = false;
-                }, 3000);
+                }, $rootScope.connection.waitForNextTry * oneSecondInMs);
                 return error;
               });
           }
-        },1000,0);
+        }, oneSecondInMs);
       }
     }
   }])
@@ -108,17 +110,23 @@ angular.module('networkStatus', [])
         ].join('');
       },
       link: function(scope, elm, attrs, ctrl) {
+        const oneSecondInMs = 1000;
 
         var getInternetStatus = function() {
+          console.log('repetindo em ', $rootScope.connection.networkStatusInterval * oneSecondInMs);
           $rootScope.connection.iamOnline = false;
           $rootScope.connection.message = 'Você está sem conexão a Internet';
           if (navigator.onLine) {
             $rootScope.connection.iamOnline = true;
             $rootScope.connection.message = 'Você possui conexão com a internet';
+
+            if (!$rootScope.connection.isLatencyOkay){
+              $rootScope.connection.message = 'Sua conexão com a Internet está lenta';
+            }
           }
         };
 
-        $interval(getInternetStatus, 1000);
+        $interval(getInternetStatus, 2000);
       }
     }
   }])

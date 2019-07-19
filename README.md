@@ -24,13 +24,23 @@ Na seção config adicione:
 Na seção run adicione:
 
     $rootScope.connection = {
-      iamOnline: false,
+      iamOnline: true,
       isLatencyOkay: true,
-      isApiAccessible: false,
-      countDown: 15,
+      isApiAccessible: true,
       showTryFailed: false,
-      message: 'Você possui conexão com a internet'
+      message: 'Você possui conexão com a internet',
+      countDown: 0,
+      refreshInterval: 15,
+      waitForNextTry: 3,
+      maximumLatency: 1.5,
+      networkStatusInterval: 2
     };
+    
+Onde os parâmetros abaixo podem ser ajustados:<br>
+    `refreshInterval`, é o tempo de espera em segundos para cada nova tentativa de se conectar a API, ajuste por projeto/ambiente.<br>
+    `waitForNextTry`, é o tempo em segundos que a mensagem de retorno da tentativa fica em exibição, o tempo deve ser suficiente para a leitura.<br>
+    `maximumLatency`, é o tempo máximo em segundos para que a latência seja considerada ruim, deve ser ajudado por projeto/ambiente.<br>
+    `networkStatusInterval`, é o tempo em segundos para a verificação de conexão com a Internet, ajuste com critério pois fica em repetição.<br>   
     
 No Gruntfile.js:
  
