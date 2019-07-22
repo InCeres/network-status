@@ -1,6 +1,6 @@
 {
   "name": "network-status",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Network Status Directive",
   "dependencies": {
     "bower": "^1.8.0",

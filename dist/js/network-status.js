@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('networkStatus', [])
-  .factory('ConnectionStatus', ['$rootScope', '$q', '$injector', '$interval', '$timeout', 'appConfig', function($rootScope, $q, $injector, $interval, $timeout, appConfig) {
+  .factory('ConnectionStatus', ['$rootScope', '$q', '$injector', '$interval', '$timeout', 'appConfig', 'Alert', function($rootScope, $q, $injector, $interval, $timeout, appConfig, Alert) {
 
     var latency = 0;
     var startTime = 0;
@@ -74,7 +74,12 @@ angular.module('networkStatus', [])
                   $interval.cancel(promise);
                   $rootScope.connection.isApiAccessible = true;
                   $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
-                  return response;
+                  Alert.success('Sucesso', 'Sua conexão foi restabelecida, os dados serão recarregados.');
+                  $interval.cancel(promise);
+                  $timeout(function () {
+                    location.reload();
+                    return response;
+                  }, $rootScope.connection.waitForNextTry * oneSecondInMs);
                 }
                 $rootScope.connection.countDown = $rootScope.connection.refreshInterval + $rootScope.connection.waitForNextTry;
                 $rootScope.connection.showTryFailed = true;
@@ -113,7 +118,6 @@ angular.module('networkStatus', [])
         const oneSecondInMs = 1000;
 
         var getInternetStatus = function() {
-          console.log('repetindo em ', $rootScope.connection.networkStatusInterval * oneSecondInMs);
           $rootScope.connection.iamOnline = false;
           $rootScope.connection.message = 'Você está sem conexão a Internet';
           if (navigator.onLine) {
