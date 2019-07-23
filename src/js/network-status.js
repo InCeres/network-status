@@ -39,14 +39,6 @@ angular.module('networkStatus', [])
             return error.config;
           });
       },
-      'responseError': function(response) {
-        if (response.status === 502){
-          $rootScope.connection.isApiAccessible = false;
-          itIsTheFinalCountDown();
-          return $q.reject(response);
-        }
-        return response;
-      },
       'response': function(response) {
         if(response.config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
           $rootScope.connection.isLatencyOkay = true;
