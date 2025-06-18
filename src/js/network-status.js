@@ -7,10 +7,43 @@ angular.module('networkStatus', [])
     var startTime = 0;
     var promiseStarted = false;
     const oneSecondInMs = 1000;
+    var lastHealthCheck = null;
+    var healthCheckTimeout = 5000;
+
+    function performHealthCheck() {
+      startTime = +new Date();
+      var http = $injector.get('$http');
+      var healthCheckPromise = http.get('{0}/healthcheck'.format([appConfig.backendURL])).then(
+        function(response) {
+          if (response.data.result === 'OK') {
+            $rootScope.connection.isApiAccessible = true;
+            $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
+            $timeout(function() {
+              lastHealthCheck = null;
+            }, healthCheckTimeout);
+            return response;
+          }
+          $rootScope.connection.isApiAccessible = false;
+          itIsTheFinalCountDown();
+          return $q.reject(response);
+        },
+        function(error) {
+          if (error.status === 502) {
+            $rootScope.connection.isApiAccessible = false;
+            itIsTheFinalCountDown();
+            return $q.reject(error);
+          }
+          return error.config;
+        }
+      );
+      lastHealthCheck = healthCheckPromise;
+      return healthCheckPromise;
+    }
 
     return {
       'request': function(config) {
         $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
+
         if(config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
           startTime = +new Date();
           return config;
@@ -18,26 +51,27 @@ angular.module('networkStatus', [])
         if(config.url.indexOf('.html') > -1) {
           return config;
         }
-        var http = $injector.get('$http');
-        return http.get('{0}/healthcheck'.format([appConfig.backendURL])).then(
-          function (response) {
-            if (response.data.result === 'OK'){
-              $rootScope.connection.isApiAccessible = true;
-              $rootScope.connection.countDown = $rootScope.connection.refreshInterval;
+
+        if (lastHealthCheck) {
+          return lastHealthCheck.then(
+            function(response) {
               return config;
+            },
+            function(errorConfig) {
+              return $q.reject(errorConfig);
             }
-            $rootScope.connection.isApiAccessible = false;
-            itIsTheFinalCountDown();
-            return $q.reject(config);
+          );
+        }
+
+        return performHealthCheck().then(
+          function(response) {
+            return config;
           },
           function(error) {
-            if (error.status === 502){
-              $rootScope.connection.isApiAccessible = false;
-              itIsTheFinalCountDown();
-              return $q.reject(error.config);
-            }
-            return error.config;
-          });
+            return $q.reject(config);
+          }
+        );
+
       },
       'response': function(response) {
         if(response.config.url.indexOf('{0}/healthcheck'.format([appConfig.backendURL])) > -1) {
